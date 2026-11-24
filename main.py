@@ -101,10 +101,16 @@ def main() -> None:
         f.write(FORTUNE)
     # Read-back validation: the gate is 1-140 characters of UTF-8
     # text, one line, not only white space, so the file must hold
-    # exactly the fortune we intended to write.
+    # exactly the fortune we intended to write. This comparison is
+    # explicit rather than an assert so it still fires when Python
+    # is run with -O (which strips asserts): a mismatch exits
+    # non-zero instead of silently passing.
     with open(path, "rb") as f:
         data = f.read()
-    assert validate_fortune(data) == FORTUNE
+    if validate_fortune(data) != FORTUNE:
+        raise SystemExit(
+            "read-back mismatch: entry.txt does not hold the intended fortune"
+        )
     print(FORTUNE)
 
 
